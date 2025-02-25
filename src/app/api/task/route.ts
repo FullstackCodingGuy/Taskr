@@ -8,10 +8,10 @@ export async function PUT(request) {
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get('id');
 
-  console.log('deleting task..', id, form)
-  // await connectToDatabase();
-  //  const updatedTask: ITask | null = await Task.findByIdAndUpdate(id, req.body, { new: true });
-  return NextResponse.json({}, { status: 200 });
+  console.log('toggling task..', id, form)
+  await connectToDatabase();
+   const updatedTask: ITask | null = await Task.findByIdAndUpdate(id, form, { new: true });
+  return NextResponse.json(updatedTask, { status: 200 });
 }
 
 
