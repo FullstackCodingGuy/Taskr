@@ -82,7 +82,7 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
+    <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper elevation={3} sx={{ p: 5 }}>
         <Typography variant="h5" gutterBottom>
           Task Manager
