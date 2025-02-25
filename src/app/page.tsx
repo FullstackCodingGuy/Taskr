@@ -15,6 +15,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Paper from "@mui/material/Paper";
+import Badge from "@mui/material/Badge";
 
 interface Task {
   _id: string;
@@ -82,10 +83,11 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper elevation={3} sx={{ p: 5 }}>
+    <Container maxWidth="md" sx={{ mt: 1 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" gutterBottom>
-          Task Manager
+          Tasks
+          <Badge badgeContent={tasks?.length} color="info" sx={{ml:2}}></Badge>
         </Typography>
         <TextField
           fullWidth
@@ -98,7 +100,7 @@ export default function Home() {
         <Button variant="contained" onClick={addTask} loading={loadingState}>
           Add Task
         </Button>
-        <List>
+        <List sx={{ mt: 1, mx: -3 }}>
           {tasks.map((task) => (
             <ListItem
               key={task._id}
