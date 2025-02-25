@@ -8,15 +8,16 @@ if (!MONGODB_URI) {
   console.warn('database defined')
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cached = (global as any).mongoose || { conn: null, promise: null };
 
 async function connectToDatabase() {
   if (cached.conn) return cached.conn;
   
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
     }).then((mongoose) => mongoose);
   }
   

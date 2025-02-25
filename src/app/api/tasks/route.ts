@@ -3,7 +3,7 @@ import Task, { ITask } from "@/models/Task";
 import { NextResponse } from "next/server";
 
 // To handle a GET request to /api
-export async function GET(request) {
+export async function GET() {
   await connectToDatabase();
   const tasks: ITask[] = await Task.find({});
   return NextResponse.json(tasks, { status: 200 });
