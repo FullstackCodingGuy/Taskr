@@ -1,4 +1,3 @@
-"use client"
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, List, ListItem, ListItemText, IconButton, Checkbox } from '@mui/material';
@@ -20,20 +19,18 @@ export default function Home() {
 
   const addTask = async () => {
     if (!newTask) return;
-    const form = { title: newTask }
-    // console.log('addtask:', form)
-    const res = await axios.post<Task>('/api/tasks', form);
+    const res = await axios.post<Task>('/api/tasks', { title: newTask });
     setTasks([...tasks, res.data]);
     setNewTask('');
   };
 
   const toggleTask = async (task: Task) => {
-    const res = await axios.put<Task>(`/api/task?id=${task._id}`, { completed: !task.completed });
+    const res = await axios.put<Task>(`/api/task/${task._id}`, { completed: !task.completed });
     setTasks(tasks.map((t) => (t._id === task._id ? res.data : t)));
   };
 
   const deleteTask = async (id: string) => {
-    await axios.delete(`/api/task?id=${id}`);
+    await axios.delete(`/api/task/${id}`);
     setTasks(tasks.filter((t) => t._id !== id));
   };
 
