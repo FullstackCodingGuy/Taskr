@@ -1,4 +1,5 @@
 "use client";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -159,9 +160,9 @@ function TaskHeader(props) {
 }
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [tasks, setTasks] = useState<Task[]>([]);
-
-  const [initialLoading, setInitialLoading] = useState(true); // Add initial loading state
+  const [initialLoading, setInitialLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = useState("");
 
@@ -178,26 +179,15 @@ export default function Home() {
   const loadList = () => {
     axios.get("/api/tasks").then((res) => {
       setTasks(res.data);
-      setInitialLoading(false); // Set initial loading to false after tasks are loaded
+      setInitialLoading(false);
     });
   };
 
   useEffect(() => {
-    loadList();
-  }, []);
-
-  // const addTask = async () => {
-  //   if (!newTask.title || !newTask.dueDate) {
-  //     console.error("Validation error");
-  //     return;
-  //   }
-  //   setLoadingState(true);
-  //   const res = await axios.post<Task>("/api/tasks", newTask);
-  //   setTasks([...tasks, res.data]);
-  //   setNewTask({ title: "", dueDate: "", priority: "Medium" });
-  //   showSnackBar("Task added!");
-  //   setLoadingState(false);
-  // };
+    if (status === "authenticated") {
+      loadList();
+    }
+  }, [status]);
 
   const toggleTask = async (task: Task) => {
     const res = await axios.put<Task>(`/api/task?id=${task._id}`, {
@@ -210,7 +200,6 @@ export default function Home() {
   const deleteTask = async (id: string) => {
     await axios.delete(`/api/task?id=${id}`);
     const list = tasks.filter((t) => t._id !== id);
-    // console.log('after.deletion:', list)
     showSnackBar("Task deleted!");
     setTasks(list);
   };
@@ -229,12 +218,30 @@ export default function Home() {
     showSnackBar(msg);
     loadList();
   };
+
+  if (status === "loading") {
+    return <CircularProgress />;
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <Container maxWidth="md" sx={{ mt: 1 }}>
+        <Typography variant="h5" gutterBottom>
+          Please sign in to manage your tasks.
+        </Typography>
+        <Button variant="contained" onClick={() => signIn()}>
+          Sign In
+        </Button>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="md" sx={{ mt: 1 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <TaskHeader {...{ tasks, onClose: onDialogClose }} />
 
-        {initialLoading ? ( // Show loading icon if initial loading is true
+        {initialLoading ? (
           <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
             <CircularProgress />
           </Box>
@@ -255,7 +262,7 @@ export default function Home() {
                 />
                 <ListItemText
                   primary={`${task.title} (Due: ${format(
-                    task.dueDate ?? new Date(),
+                    new Date(task.dueDate),
                     "dd MMM"
                   )})`}
                   secondary={`Priority: ${task.priority}`}
@@ -274,7 +281,6 @@ export default function Home() {
         onClose={handleClose}
         message={snackBarMsg}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        // action={action}
       />
     </Container>
   );

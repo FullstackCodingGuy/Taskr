@@ -1,0 +1,37 @@
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+
+const handler = NextAuth({
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    }),
+    // Add more providers here
+  ],
+  // Optional: Add custom pages for sign-in, sign-out, etc.
+  pages: {
+    signIn: "/auth/signin",
+  },
+  // Optional: Add callbacks for session and JWT
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.id;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+  },
+});
+export { handler as GET, handler as POST }
