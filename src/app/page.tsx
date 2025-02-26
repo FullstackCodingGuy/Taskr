@@ -47,7 +47,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
 
   const newTaskProp = {
     title: "",
-    dueDate: format(new Date(), "dd/MM/yyyy"),
+    dueDate: new Date().toISOString().slice(0, 10),
     priority: "Medium",
   };
   const [loadingState, setLoadingState] = useState(false);
