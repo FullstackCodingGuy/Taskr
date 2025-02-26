@@ -26,7 +26,7 @@ import Grid from "@mui/material/Grid2";
 import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { format } from "date-fns";
 
 interface Task {
   _id: string;
@@ -43,7 +43,7 @@ export interface SimpleDialogProps {
 }
 
 function AddTaskDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open } = props;
+  const { onClose, open } = props;
 
   const newTaskProp = {
     title: "",
@@ -57,19 +57,14 @@ function AddTaskDialog(props: SimpleDialogProps) {
     onClose("");
   };
 
-  const handleListItemClick = (value: string) => {
-    onClose(value);
-  };
   const addTask = async () => {
     if (!newTask.title || !newTask.dueDate) {
       console.error("Validation error");
       return;
     }
     setLoadingState(true);
-    const res = await axios.post<Task>("/api/tasks", newTask);
-    // setTasks([...tasks, res.data]);
+    await axios.post<Task>("/api/tasks", newTask);
     setNewTask(newTaskProp);
-    // showSnackBar("Task added!");
     setLoadingState(false);
     onClose("Task added!");
   };
@@ -95,7 +90,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
               size="small"
               value={newTask.dueDate}
               onChange={(e) =>
-                setNewTask({ ...newTask, dueDate: e.target.value })
+                setNewTask({ ...newTask, dueDate: new Date(e.target.value) })
               }
               sx={{ mt: 2 }}
             />
@@ -128,9 +123,9 @@ function AddTaskDialog(props: SimpleDialogProps) {
   );
 }
 
-export function TaskHeader(props) {
+function TaskHeader(props) {
   const [open, setOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState();
+  const [selectedValue] = useState();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -185,7 +180,7 @@ export default function Home() {
       setTasks(res.data);
       setInitialLoading(false); // Set initial loading to false after tasks are loaded
     });
-  }
+  };
 
   useEffect(() => {
     loadList();
@@ -259,7 +254,10 @@ export default function Home() {
                   onChange={() => toggleTask(task)}
                 />
                 <ListItemText
-                  primary={`${task.title} (Due: ${format(task.dueDate ?? new Date(), "dd MMM")})`}
+                  primary={`${task.title} (Due: ${format(
+                    task.dueDate ?? new Date(),
+                    "dd MMM"
+                  )})`}
                   secondary={`Priority: ${task.priority}`}
                   sx={{
                     textDecoration: task.completed ? "line-through" : "none",
