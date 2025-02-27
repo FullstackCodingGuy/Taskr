@@ -33,7 +33,7 @@ interface Task {
   _id: string;
   title: string;
   completed: boolean;
-  dueDate: string;
+  dueDate?: string;
   priority: "Low" | "Medium" | "High";
 }
 
@@ -41,6 +41,8 @@ export interface SimpleDialogProps {
   open: boolean;
   selectedValue?: Task;
   onClose: (value: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
 }
 
 function AddTaskDialog(props: SimpleDialogProps) {
@@ -50,6 +52,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
     title: "",
     dueDate: new Date().toISOString().slice(0, 10),
     priority: "Medium",
+    userId: props.user.id
   };
   const [loadingState, setLoadingState] = useState(false);
   const [newTask, setNewTask] = useState(newTaskProp);
@@ -59,7 +62,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
   };
 
   const addTask = async () => {
-    if (!newTask.title || !newTask.dueDate) {
+    if (!newTask.title) {
       console.error("Validation error");
       return;
     }
@@ -164,6 +167,7 @@ function TaskHeader(props) {
         selectedValue={selectedValue}
         open={open}
         onClose={handleClose}
+        user={props.user}
       />
     </Stack>
   );
@@ -188,7 +192,8 @@ export default function Home() {
 
   const loadList = useCallback(() => {
     console.log("page>>session: ", status, session);
-    axios.get("/api/tasks").then((res) => {
+    if(!session || !session.user || !session.user.id) return;
+    axios.get(`/api/tasks?uid=${session?.user?.id}`).then((res) => {
       setTasks(res.data);
       setInitialLoading(false);
     });
@@ -287,7 +292,11 @@ export default function Home() {
               </ListItem>
             ))}
           </List>
-        )}
+          
+        )
+        
+        }
+       
         {/* <Fab
           color="primary"
           aria-label="add"

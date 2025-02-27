@@ -3,9 +3,12 @@ import Task, { ITask } from "@/models/Task";
 import { NextResponse } from "next/server";
 
 // To handle a GET request to /api
-export async function GET() {
+export async function GET(request) {
+  const searchParams = request.nextUrl.searchParams;
+  const uid = searchParams.get('uid');
+  // console.log('get list for user id: ', id)
   await connectToDatabase();
-  const tasks: ITask[] = await Task.find({});
+  const tasks: ITask[] = await Task.find({userId: uid});
   return NextResponse.json(tasks, { status: 200 });
 }
 

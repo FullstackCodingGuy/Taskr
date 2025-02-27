@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ITask extends Document {
   title: string;
   completed: boolean;
-  dueDate: Date;
+  dueDate?: Date;
   priority: 'Low' | 'Medium' | 'High';
   userId: string;
 }
@@ -11,7 +11,7 @@ export interface ITask extends Document {
 const TaskSchema = new Schema<ITask>({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
-  dueDate: { type: Date, required: true },
+  dueDate: { type: Date, required: false },
   priority: { type: String, enum: ['Low', 'Medium', 'High'], required: true },
   userId: { type: String, required: false },
 }, { timestamps: true });
