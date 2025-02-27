@@ -1,12 +1,11 @@
 "use client";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   Container,
   Typography,
   TextField,
-  Button,
   List,
   ListItem,
   ListItemText,
@@ -16,7 +15,7 @@ import {
   DialogContent,
   Stack,
   Avatar,
-  Fab,
+  Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
@@ -30,7 +29,6 @@ import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import { format } from "date-fns";
-import AddIcon from "@mui/icons-material/Add";
 interface Task {
   _id: string;
   title: string;
@@ -155,7 +153,7 @@ function TaskHeader(props) {
 
       <Button
         size="small"
-        onClick={signOut}
+        onClick={() => signOut()}
         startIcon={
           <Avatar alt={props.user.name} src={props.user.image}/>
         }
@@ -188,19 +186,19 @@ export default function Home() {
     setOpenSnackBar(false);
   };
 
-  const loadList = () => {
+  const loadList = useCallback(() => {
     console.log("page>>session: ", status, session);
     axios.get("/api/tasks").then((res) => {
       setTasks(res.data);
       setInitialLoading(false);
     });
-  };
+  }, [status, session]);
 
   useEffect(() => {
     if (status === "authenticated") {
       loadList();
     }
-  }, [status]);
+  }, [status, loadList]);
 
   const toggleTask = async (task: Task) => {
     const res = await axios.put<Task>(`/api/task?id=${task._id}`, {
@@ -257,7 +255,7 @@ export default function Home() {
         />
 
         {initialLoading ? (
-          <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
+          <Box display="flex" justifyContent="center" justifyItems={"center"} sx={{ mt: 2 }}>
             <CircularProgress />
           </Box>
         ) : (

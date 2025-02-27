@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import type { Metadata } from "next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import "./globals.css";
@@ -20,11 +20,8 @@ const inter = Inter({
 
 export default function RootLayout({
   children,
-  session,
 }: Readonly<{
   children: React.ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  session: any;
 }>) {
   return (
     <html lang="en">
@@ -32,7 +29,7 @@ export default function RootLayout({
         <title>{metadata.applicationName}</title>
       </head>
       <body className={inter.className}>
-        <SessionProvider session={session}>
+        <SessionProvider>
           <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
         </SessionProvider>
       </body>

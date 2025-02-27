@@ -2,12 +2,12 @@
 
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import { getProviders, signIn } from "next-auth/react";
+import { ClientSafeProvider, getProviders, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import GoogleIcon from "@mui/icons-material/Google";
 import Typography from "@mui/material/Typography";
 export default function SignIn() {
-  const [providers, setProviders] = useState(null);
+  const [providers, setProviders] = useState<Record<string, ClientSafeProvider> | null>(null);
 
   useEffect(() => {
     const fetchProviders = async () => {
