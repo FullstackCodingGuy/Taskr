@@ -16,14 +16,16 @@ import {
   Stack,
   Avatar,
   Button,
+  AppBar,
+  Link,
+  Menu,
+  Toolbar,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
-import Paper from "@mui/material/Paper";
 import Badge from "@mui/material/Badge";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid2";
 import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
@@ -52,7 +54,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
     title: "",
     dueDate: new Date().toISOString().slice(0, 10),
     priority: "Medium",
-    userId: props.user.id
+    userId: props.user.id,
   };
   const [loadingState, setLoadingState] = useState(false);
   const [newTask, setNewTask] = useState(newTaskProp);
@@ -130,6 +132,7 @@ function AddTaskDialog(props: SimpleDialogProps) {
 function TaskHeader(props) {
   const [open, setOpen] = useState(false);
   const [selectedValue] = useState();
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -140,36 +143,63 @@ function TaskHeader(props) {
     props.onClose(value);
   };
 
-  return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <Typography variant="h5" gutterBottom>
-        Tasks
-        <Badge
-          badgeContent={props?.tasks?.length}
-          color="info"
-          sx={{ ml: 2 }}
-        ></Badge>
-      </Typography>
-      <Button variant="contained" onClick={handleClickOpen}>
-        Add Task
-      </Button>
+  const menuopen = Boolean(anchorEl);
 
-      <Button
-        size="small"
-        onClick={() => signOut()}
-        startIcon={
-          <Avatar alt={props.user.name} src={props.user.image}/>
-        }
-      >
-        Signout
-      </Button>
-      <AddTaskDialog
-        selectedValue={selectedValue}
-        open={open}
-        onClose={handleClose}
-        user={props.user}
-      />
-    </Stack>
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <Container>
+      <AppBar position="absolute" color="transparent">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Tasks
+            <Badge
+              badgeContent={props?.tasks?.length}
+              color="info"
+              sx={{ ml: 2 }}
+            ></Badge>
+          </Typography>
+          <div className="hidden md:flex space-x-4">
+            <Button
+              variant="text"
+              color="warning"
+              size="small"
+              onClick={handleClickOpen}
+            >
+              Add Task
+            </Button>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleMenu}
+              sx={{ display: { lg: "none" } }}
+            >
+              <Avatar alt={props.user.name} src={props.user.image} />
+            </IconButton>
+          </div>
+          <Menu anchorEl={anchorEl} open={menuopen} onClose={handleMenuClose}>
+            <MenuItem onClick={() => signOut()} component={Link}>
+              Sign Out
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <AddTaskDialog
+          selectedValue={selectedValue}
+          open={open}
+          onClose={handleClose}
+          user={props.user}
+        />
+      </Stack>
+    </Container>
   );
 }
 
@@ -179,6 +209,7 @@ export default function Home() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = useState("");
+
   const showSnackBar = (msg: string) => {
     if (!msg) return;
     setSnackBarMsg(msg);
@@ -192,8 +223,8 @@ export default function Home() {
 
   const loadList = useCallback(() => {
     console.log("page>>session: ", status, session);
-    if(!session || !session.user || !session.user['id']) return;
-    axios.get(`/api/tasks?uid=${session?.user['id']}`).then((res) => {
+    if (!session || !session.user || !session.user["id"]) return;
+    axios.get(`/api/tasks?uid=${session?.user["id"]}`).then((res) => {
       setTasks(res.data);
       setInitialLoading(false);
     });
@@ -241,30 +272,36 @@ export default function Home() {
 
   if (status === "unauthenticated") {
     return (
-      <Container sx={{ textAlign: "center" }} maxWidth="sm">
-        <Typography variant="h5" gutterBottom>
-          Please sign in to manage your tasks.
-        </Typography>
-        <Button variant="contained" onClick={() => signIn()}>
-          Sign In
-        </Button>
+      <Container sx={{ textAlign: "center" }}>
+        <div className="bg-gray-50 text-gray-900 font-sans">
+          <header className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-center px-6">
+            <h1 className="text-5xl font-bold mb-4">Taskr</h1>
+            <p className="text-lg mb-6">Minimalistic personal task manager.</p>
+            <a
+              href="#"
+              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-100 transition"
+            >
+              <Button onClick={() => signIn()}>Get Started</Button>
+            </a>
+          </header>
+
+          <footer className="text-center py-6 text-gray-600">
+            <p>&copy; 2025 Taskr. All rights reserved.</p>
+          </footer>
+        </div>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 1 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <TaskHeader
-          {...{ tasks, user: session?.user, onClose: onDialogClose }}
-        />
+    <Stack direction="column">
+      <TaskHeader {...{ tasks, user: session?.user, onClose: onDialogClose }} />
 
+      <Container sx={{ mt: 10 }}>
         {initialLoading ? (
-          <Box display="flex" justifyContent="center" justifyItems={"center"} sx={{ mt: 2 }}>
-            <CircularProgress />
-          </Box>
+          <CircularProgress />
         ) : (
-          <List sx={{ mt: 1, mx: -3 }}>
+          <List>
             {tasks.map((task) => (
               <ListItem
                 key={task._id}
@@ -292,24 +329,8 @@ export default function Home() {
               </ListItem>
             ))}
           </List>
-          
-        )
-        
-        }
-       
-        {/* <Fab
-          color="primary"
-          aria-label="add"
-          sx={{
-            position: "fixed",
-            bottom: (theme) => theme.spacing(2),
-            // right: (theme) => theme.spacing(15),
-            
-          }} 
-        >
-          <AddIcon />
-        </Fab> */}
-      </Paper>
+        )}
+      </Container>
       <Snackbar
         open={openSnackBar}
         autoHideDuration={3000}
@@ -317,6 +338,6 @@ export default function Home() {
         message={snackBarMsg}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
-    </Container>
+    </Stack>
   );
 }

@@ -19,7 +19,7 @@ export default function SignIn() {
   }, []);
 
   if (!providers) {
-    return <div>Loading...</div>;
+    return <Container maxWidth="sm" sx={{ textAlign: "center", mt: 5 }}>Loading...</Container>;
   }
 
   return (
