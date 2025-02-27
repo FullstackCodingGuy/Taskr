@@ -192,8 +192,8 @@ export default function Home() {
 
   const loadList = useCallback(() => {
     console.log("page>>session: ", status, session);
-    if(!session || !session.user || !session.user.id) return;
-    axios.get(`/api/tasks?uid=${session?.user?.id}`).then((res) => {
+    if(!session || !session.user || !session.user['id']) return;
+    axios.get(`/api/tasks?uid=${session?.user['id']}`).then((res) => {
       setTasks(res.data);
       setInitialLoading(false);
     });
