@@ -1,8 +1,11 @@
 "use client";
 
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import { getProviders, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
-
+import GoogleIcon from "@mui/icons-material/Google";
+import Typography from "@mui/material/Typography";
 export default function SignIn() {
   const [providers, setProviders] = useState(null);
 
@@ -20,15 +23,24 @@ export default function SignIn() {
   }
 
   return (
-    <div>
-      <h1>Sign In</h1>
+    <Container maxWidth="sm" sx={{ textAlign: "center", mt: 5 }}>
+      <Typography variant="h5" component="h2" mb={2}>
+        Sign In
+      </Typography>
       {Object.values(providers).map((provider) => (
         <div key={provider.name}>
-          <button onClick={() => signIn(provider.id)}>
+          <Button
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+          >
+            Sign in with Google
+          </Button>
+          {/* <button onClick={() => signIn(provider.id, {callbackUrl: "/"})}>
             Sign in with {provider.name}
-          </button>
+          </button> */}
         </div>
       ))}
-    </div>
+    </Container>
   );
 }

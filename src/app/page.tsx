@@ -15,6 +15,8 @@ import {
   CircularProgress,
   DialogContent,
   Stack,
+  Avatar,
+  Fab,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
@@ -28,7 +30,7 @@ import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import { format } from "date-fns";
-
+import AddIcon from "@mui/icons-material/Add";
 interface Task {
   _id: string;
   title: string;
@@ -150,6 +152,16 @@ function TaskHeader(props) {
       <Button variant="contained" onClick={handleClickOpen}>
         Add Task
       </Button>
+
+      <Button
+        size="small"
+        onClick={signOut}
+        startIcon={
+          <Avatar alt={props.user.name} src={props.user.image}/>
+        }
+      >
+        Signout
+      </Button>
       <AddTaskDialog
         selectedValue={selectedValue}
         open={open}
@@ -165,8 +177,8 @@ export default function Home() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = useState("");
-
   const showSnackBar = (msg: string) => {
+    if (!msg) return;
     setSnackBarMsg(msg);
     setOpenSnackBar(true);
   };
@@ -177,6 +189,7 @@ export default function Home() {
   };
 
   const loadList = () => {
+    console.log("page>>session: ", status, session);
     axios.get("/api/tasks").then((res) => {
       setTasks(res.data);
       setInitialLoading(false);
@@ -225,7 +238,7 @@ export default function Home() {
 
   if (status === "unauthenticated") {
     return (
-      <Container maxWidth="md" sx={{ mt: 1 }}>
+      <Container sx={{ textAlign: "center" }} maxWidth="sm">
         <Typography variant="h5" gutterBottom>
           Please sign in to manage your tasks.
         </Typography>
@@ -239,7 +252,9 @@ export default function Home() {
   return (
     <Container maxWidth="md" sx={{ mt: 1 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
-        <TaskHeader {...{ tasks, onClose: onDialogClose }} />
+        <TaskHeader
+          {...{ tasks, user: session?.user, onClose: onDialogClose }}
+        />
 
         {initialLoading ? (
           <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
@@ -261,10 +276,11 @@ export default function Home() {
                   onChange={() => toggleTask(task)}
                 />
                 <ListItemText
-                  primary={`${task.title} (Due: ${format(
-                    new Date(task.dueDate),
-                    "dd MMM"
-                  )})`}
+                  primary={`${task.title} ${
+                    task.dueDate
+                      ? `(Due: ${format(new Date(task.dueDate), "dd MMM")})`
+                      : ""
+                  }`}
                   secondary={`Priority: ${task.priority}`}
                   sx={{
                     textDecoration: task.completed ? "line-through" : "none",
@@ -274,6 +290,18 @@ export default function Home() {
             ))}
           </List>
         )}
+        {/* <Fab
+          color="primary"
+          aria-label="add"
+          sx={{
+            position: "fixed",
+            bottom: (theme) => theme.spacing(2),
+            // right: (theme) => theme.spacing(15),
+            
+          }} 
+        >
+          <AddIcon />
+        </Fab> */}
       </Paper>
       <Snackbar
         open={openSnackBar}

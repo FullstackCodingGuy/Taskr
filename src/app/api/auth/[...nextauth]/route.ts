@@ -24,12 +24,14 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       session.user.id = token.id;
+      // console.log('>>>session user id: ', token.id)
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
+      // console.log('>>>>jwt:token: ', token)
       return token;
     },
   },
