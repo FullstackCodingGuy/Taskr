@@ -179,7 +179,7 @@ function TaskHeader(props) {
               color="inherit"
               aria-label="menu"
               onClick={handleMenu}
-              sx={{ display: { lg: "none" } }}
+              // sx={{ display: { lg: "none" } }}
             >
               <Avatar alt={props.user.name} src={props.user.image} />
             </IconButton>
