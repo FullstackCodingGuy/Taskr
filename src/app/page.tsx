@@ -21,6 +21,7 @@ import {
   Menu,
   Toolbar,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Badge from "@mui/material/Badge";
@@ -31,6 +32,7 @@ import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import { format } from "date-fns";
+import green from "@mui/material/colors/green";
 interface Task {
   _id: string;
   title: string;
@@ -165,12 +167,13 @@ function TaskHeader(props) {
               sx={{ ml: 2 }}
             ></Badge>
           </Typography>
-          <div className="hidden md:flex space-x-4">
+          <div className="space-x-4">
             <Button
-              variant="text"
-              color="warning"
+              variant="contained"
+              color="success"
               size="small"
               onClick={handleClickOpen}
+              startIcon={<AddIcon />}
             >
               Add Task
             </Button>
@@ -306,7 +309,7 @@ export default function Home() {
               <ListItem
                 key={task._id}
                 secondaryAction={
-                  <IconButton edge="end" onClick={() => deleteTask(task._id)}>
+                  <IconButton edge="end" onClick={() => deleteTask(task._id)} color="error">
                     <DeleteIcon />
                   </IconButton>
                 }
@@ -314,6 +317,12 @@ export default function Home() {
                 <Checkbox
                   checked={task.completed}
                   onChange={() => toggleTask(task)}
+                  sx={{
+                    color: green[800],
+                    '&.Mui-checked': {
+                      color: green[600],
+                    },
+                  }}
                 />
                 <ListItemText
                   primary={`${task.title} ${
